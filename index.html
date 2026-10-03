@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulado PMMA 2026</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#f2f4f7;
+  color:#17202a;
+}
+header{
+  background:#16263d;
+  color:white;
+  padding:22px 15px;
+  text-align:center;
+}
+header h1{margin:0;font-size:26px}
+header p{margin:7px 0 0;color:#d7e1ec}
+.container{
+  max-width:720px;
+  margin:20px auto;
+  padding:0 15px;
+}
+.card{
+  background:white;
+  border-radius:14px;
+  padding:22px;
+  box-shadow:0 3px 14px rgba(0,0,0,.10);
+}
+.timer{
+  background:#fff3cd;
+  border:1px solid #ffe69c;
+  border-radius:10px;
+  padding:12px;
+  text-align:center;
+  font-weight:bold;
+  font-size:22px;
+  margin-bottom:15px;
+}
+.info{
+  background:#eef4ff;
+  padding:14px;
+  border-radius:10px;
+  margin:15px 0;
+  line-height:1.6;
+}
+button{
+  width:100%;
+  padding:15px;
+  margin-top:10px;
+  border:0;
+  border-radius:9px;
+  font-size:17px;
+  font-weight:bold;
+  cursor:pointer;
+}
+.start,.next{background:#16263d;color:white}
+.answer{
+  background:white;
+  border:2px solid #ccd4dd;
+  color:#17202a;
+}
+.answer.selected{
+  border-color:#16263d;
+  background:#e8eef7;
+}
+.blank{
+  background:#eceff1;
+  color:#263238;
+}
+.progress{
+  height:10px;
+  background:#ddd;
+  border-radius:20px;
+  overflow:hidden;
+  margin:15px 0;
+}
+.progress div{
+  height:100%;
+  background:#16263d;
+  width:0%;
+}
+.subject{
+  color:#52677f;
+  font-size:14px;
+  font-weight:bold;
+  text-transform:uppercase;
+}
+.question{
+  font-size:19px;
+  line-height:1.5;
+  margin:16px 0;
+}
+.small{
+  color:#687786;
+  font-size:14px;
+}
+.result{
+  text-align:center;
+}
+.score{
+  font-size:38px;
+  font-weight:bold;
+  margin:15px 0;
+}
+.pass{
+  background:#e7f6ec;
+  border:2px solid #2e8b57;
+  padding:18px;
+  border-radius:12px;
+}
+.fail{
+  background:#fdecec;
+  border:2px solid #c0392b;
+  padding:18px;
+  border-radius:12px;
+}
+.hidden{display:none}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>SIMULADO PMMA 2026</h1>
+  <p>Soldado • Modelo Certo ou Errado</p>
+</header>
+
+<div class="container">
+
+<div id="inicio" class="card">
+  <h2>Simulado PMMA 2026</h2>
+
+  <div class="info">
+    <b>60 itens</b><br>
+    ⏱ Tempo: <b>2 horas</b><br>
+    ✅ Resposta correta: <b>+1 ponto</b><br>
+    ❌ Resposta incorreta: <b>−1 ponto</b><br>
+    ⚪ Em branco: <b>0 ponto</b>
+  </div>
+
+  <p>
+    Leia cada item e marque <b>CERTO</b>, <b>ERRADO</b>
+    ou deixe <b>EM BRANCO</b>.
+  </p>
+
+  <p class="small">
+    Simulado independente para treinamento. Não é uma página oficial da PMMA ou do Cebraspe.
+  </p>
+
+  <button class="start" onclick="iniciar()">INICIAR SIMULADO</button>
+</div>
+
+<div id="prova" class="card hidden">
+
+  <div class="timer">
+    ⏱ <span id="tempo">02:00:00</span>
+  </div>
+
+  <div id="contador"></div>
+
+  <div class="progress">
+    <div id="barra"></div>
+  </div>
+
+  <div class="subject" id="materia"></div>
+  <div class="question" id="pergunta"></div>
+
+  <button class="answer" id="btnC" onclick="selecionar('C')">CERTO</button>
+  <button class="answer" id="btnE" onclick="selecionar('E')">ERRADO</button>
+  <button class="blank" onclick="selecionar('B')">DEIXAR EM BRANCO</button>
+
+  <button class="next" id="proxima" onclick="avancar()" disabled>PRÓXIMA QUESTÃO</button>
+</div>
+
+<div id="resultado" class="card hidden"></div>
+
+</div>
+
+<script>
+const questoes = [
+["Língua Portuguesa","Na frase “Os candidatos chegaram cedo”, a forma verbal “chegaram” concorda com o sujeito no plural.","C"],
+["Língua Portuguesa","A palavra “São Luís” é empregada como nome próprio.","C"],
+["Língua Portuguesa","Em “O policial agiu rapidamente”, a palavra “rapidamente” expressa circunstância de modo.","C"],
+["Língua Portuguesa","A palavra “caza” está escrita de acordo com a ortografia oficial da língua portuguesa.","E"],
+["Língua Portuguesa","O ponto de interrogação pode ser empregado ao final de uma pergunta direta.","C"],
+["Língua Portuguesa","Em “Os alunos estudaram para a prova”, o sujeito está no plural.","C"],
+["Língua Portuguesa","Coerência está relacionada à construção de sentido de um texto.","C"],
+["Língua Portuguesa","Na frase “Maria e João estudam”, a forma verbal deveria obrigatoriamente permanecer no singular.","E"],
+
+["Raciocínio Lógico","A sentença “São Luís é a capital do Maranhão” pode ser classificada como uma proposição.","C"],
+["Raciocínio Lógico","Uma proposição é uma sentença à qual se pode atribuir valor verdadeiro ou falso.","C"],
+["Raciocínio Lógico","Se todo soldado é militar e Carlos é soldado, então Carlos é militar.","C"],
+["Raciocínio Lógico","A negação de uma proposição verdadeira é verdadeira.","E"],
+["Raciocínio Lógico","Na proposição “João estuda e Maria trabalha”, a palavra “e” funciona como conectivo lógico.","C"],
+["Raciocínio Lógico","Se Ana é mais velha que Bia e Bia é mais velha que Carla, então Ana é mais velha que Carla.","C"],
+["Raciocínio Lógico","Uma proposição simples não possui outro conectivo lógico ligando duas proposições.","C"],
+["Raciocínio Lógico","Uma proposição pode ser simultaneamente verdadeira e falsa, no mesmo sentido e ao mesmo tempo.","E"],
+
+["História do Brasil","Os povos indígenas já habitavam o território brasileiro antes da chegada dos portugueses.","C"],
+["História do Brasil","A população negra teve participação importante na formação histórica e cultural do Brasil.","C"],
+["História do Brasil","Getúlio Vargas exerceu a Presidência da República no Brasil.","C"],
+["História do Brasil","Juscelino Kubitschek foi presidente do Brasil.","C"],
+["História do Brasil","Brasília foi inaugurada durante o governo de Juscelino Kubitschek.","C"],
+["História do Brasil","O regime militar brasileiro teve início em 1964.","C"],
+["História do Brasil","A redemocratização brasileira ocorreu após o período do regime militar.","C"],
+["História do Brasil","A economia cafeeira não teve importância na história econômica do Brasil.","E"],
+
+["História do Maranhão","A presença francesa no Maranhão está relacionada ao episódio conhecido como França Equinocial.","C"],
+["História do Maranhão","Daniel de La Touche está associado à presença francesa no Maranhão no século XVII.","C"],
+["História do Maranhão","A Batalha de Guaxenduba faz parte da história do Maranhão.","C"],
+["História do Maranhão","A Revolta de Beckman ocorreu no Maranhão.","C"],
+["História do Maranhão","A Balaiada teve forte presença no Maranhão.","C"],
+["História do Maranhão","São Luís está relacionada à presença francesa no Maranhão no início do século XVII.","C"],
+["História do Maranhão","O território maranhense jamais sofreu ocupação holandesa.","E"],
+
+["Geografia do Brasil","O Brasil está localizado na América do Sul.","C"],
+["Geografia do Brasil","Brasília é a capital do Brasil.","C"],
+["Geografia do Brasil","O Brasil é formado por 26 estados e pelo Distrito Federal.","C"],
+["Geografia do Brasil","A agricultura integra as atividades econômicas desenvolvidas no Brasil.","C"],
+["Geografia do Brasil","O processo de urbanização está relacionado ao crescimento da população urbana.","C"],
+["Geografia do Brasil","Parte da Floresta Amazônica encontra-se em território brasileiro.","C"],
+["Geografia do Brasil","O Brasil não possui atividade industrial.","E"],
+
+["Geografia do Maranhão","O Maranhão pertence à Região Nordeste do Brasil.","C"],
+["Geografia do Maranhão","São Luís é a capital do estado do Maranhão.","C"],
+["Geografia do Maranhão","O Maranhão possui litoral banhado pelo oceano Atlântico.","C"],
+["Geografia do Maranhão","O território maranhense possui rios importantes.","C"],
+["Geografia do Maranhão","O Parque Nacional dos Lençóis Maranhenses localiza-se no Maranhão.","C"],
+["Geografia do Maranhão","Agricultura e indústria fazem parte das atividades econômicas do Maranhão.","C"],
+["Geografia do Maranhão","O Maranhão é um país independente e não integra o território brasileiro.","E"],
+
+["Legislação Institucional","A sigla PMMA significa Polícia Militar do Maranhão.","C"],
+["Legislação Institucional","A Polícia Militar do Maranhão integra a estrutura de segurança pública estadual.","C"],
+["Legislação Institucional","A Lei Estadual nº 6.513/1995 dispõe sobre o Estatuto dos Policiais-Militares da Polícia Militar do Maranhão.","C"],
+["Legislação Institucional","A Lei Federal nº 14.751/2023 instituiu uma lei orgânica nacional para as polícias militares e os corpos de bombeiros militares dos estados, do Distrito Federal e dos territórios.","C"],
+["Legislação Institucional","Normas estatutárias podem tratar de direitos, deveres e situações funcionais dos policiais militares.","C"],
+["Legislação Institucional","Por integrar a administração pública, a atuação policial militar deve observar as normas jurídicas aplicáveis.","C"],
+["Legislação Institucional","O policial militar está dispensado do cumprimento de deveres funcionais previstos em lei.","E"],
+
+["Informática","O Windows é um sistema operacional.","C"],
+["Informática","Linux é o nome associado a sistemas operacionais.","C"],
+["Informática","O Microsoft Word é utilizado principalmente para edição de textos.","C"],
+["Informática","Planilhas eletrônicas podem realizar cálculos e organizar dados.","C"],
+["Informática","Um navegador de internet permite acessar páginas da Web.","C"],
+["Informática","Backup é uma cópia de segurança de dados.","C"],
+["Informática","Programas antivírus podem auxiliar na proteção contra softwares maliciosos.","C"],
+["Informática","A senha “123456” é considerada uma senha forte e recomendada para contas importantes.","E"]
+];
+
+let atual = 0;
+let respostas = new Array(questoes.length).fill(null);
+let escolhida = null;
+let segundos = 2 * 60 * 60;
+let intervalo;
+
+function iniciar(){
+  document.getElementById("inicio").classList.add("hidden");
+  document.getElementById("prova").classList.remove("hidden");
+  mostrar();
+  intervalo = setInterval(relogio,1000);
+}
+
+function relogio(){
+  segundos--;
+
+  if(segundos <= 0){
+    segundos = 0;
+    atualizarTempo();
+    finalizar(true);
+    return;
+  }
+
+  atualizarTempo();
+}
+
+function atualizarTempo(){
+  let h = Math.floor(segundos/3600);
+  let m = Math.floor((segundos%3600)/60);
+  let s = segundos%60;
+
+  document.getElementById("tempo").textContent =
+    String(h).padStart(2,"0")+":"+
+    String(m).padStart(2,"0")+":"+
+    String(s).padStart(2,"0");
+}
+
+function mostrar(){
+  escolhida = respostas[atual];
+
+  document.getElementById("contador").innerHTML =
+    "<b>Questão "+(atual+1)+" de "+questoes.length+"</b>";
+
+  document.getElementById("materia").textContent = questoes[atual][0];
+  document.getElementById("pergunta").textContent = questoes[atual][1];
+
+  document.getElementById("barra").style.width =
+    ((atual+1)/questoes.length*100)+"%";
+
+  document.getElementById("btnC").classList.remove("selected");
+  document.getElementById("btnE").classList.remove("selected");
+
+  if(escolhida==="C") document.getElementById("btnC").classList.add("selected");
+  if(escolhida==="E") document.getElementById("btnE").classList.add("selected");
+
+  document.getElementById("proxima").disabled = escolhida===null;
+
+  document.getElementById("proxima").textContent =
+    atual===questoes.length-1 ? "FINALIZAR SIMULADO" : "PRÓXIMA QUESTÃO";
+}
+
+function selecionar(resp){
+  escolhida = resp;
+  respostas[atual] = resp;
+
+  document.getElementById("btnC").classList.remove("selected");
+  document.getElementById("btnE").classList.remove("selected");
+
+  if(resp==="C") document.getElementById("btnC").classList.add("selected");
+  if(resp==="E") document.getElementById("btnE").classList.add("selected");
+
+  document.getElementById("proxima").disabled = false;
+}
+
+function avancar(){
+  if(atual < questoes.length-1){
+    atual++;
+    mostrar();
+    window.scrollTo({top:0,behavior:"smooth"});
+  }else{
+    finalizar(false);
+  }
+}
+
+function finalizar(tempoEsgotado){
+  clearInterval(intervalo);
+
+  let acertos=0;
+  let erros=0;
+  let brancos=0;
+
+  for(let i=0;i<questoes.length;i++){
+    if(respostas[i]===null || respostas[i]==="B"){
+      brancos++;
+    }else if(respostas[i]===questoes[i][2]){
+      acertos++;
+    }else{
+      erros++;
+    }
+  }
+
+  let pontos = acertos - erros;
+
+  /*
+    Este simulado possui 60 itens.
+    O resultado abaixo usa uma referência proporcional
+    apenas para treinamento.
+  */
+  let minimoSimulado = 18;
+  let passou = pontos >= minimoSimulado;
+
+  document.getElementById("prova").classList.add("hidden");
+  const r = document.getElementById("resultado");
+  r.classList.remove("hidden");
+
+  r.innerHTML = `
+    <div class="result">
+      <h2>RESULTADO DO SIMULADO</h2>
+
+      ${tempoEsgotado ? "<p><b>⏱ O tempo de 2 horas terminou.</b></p>" : ""}
+
+      <p>✅ Acertos: <b>${acertos}</b></p>
+      <p>❌ Erros: <b>${erros}</b></p>
+      <p>⚪ Em branco: <b>${brancos}</b></p>
+
+      <div class="score">${pontos} pontos</div>
+
+      <div class="${passou ? "pass" : "fail"}">
+        <h2>${passou ? "✅ ATINGIU A NOTA DE REFERÊNCIA" : "❌ NÃO ATINGIU A NOTA DE REFERÊNCIA"}</h2>
+        <p>
+          Referência proporcional usada neste simulado de 60 itens:
+          <b>${minimoSimulado} pontos líquidos</b>.
+        </p>
+      </div>
+
+      <div class="info" style="text-align:left;margin-top:18px">
+        <b>Como a pontuação foi calculada:</b><br>
+        Certa = +1<br>
+        Errada = −1<br>
+        Em branco = 0
+      </div>
+
+      <p class="small">
+        Este resultado é apenas uma simulação de estudo e não representa
+        aprovação oficial ou convocação no concurso.
+      </p>
+
+      <button class="start" onclick="location.reload()">FAZER NOVAMENTE</button>
+    </div>
+  `;
+
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+</script>
+
+</body>
+</html>
